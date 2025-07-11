@@ -1,3 +1,5 @@
+"use client"
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,11 +11,33 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useActionState } from "react";
+import { SignIn } from "@/lib/actions"
+import { useFormStatus } from "react-dom"
+
+const initialState = {
+    success: false,
+    error: "",
+};
+
+function SubmitButton() {
+    const { pending } = useFormStatus()
+
+    return (
+        <Button type="submit" className="w-full" disabled={pending}>
+            {pending ? "Loading..." : "Sign In"}
+        </Button>
+    )
+}
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+
+    const [state, formAction] = useActionState(SignIn, initialState);
+
+    console.log(state);
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
@@ -24,11 +48,12 @@ export function LoginForm({
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form>
+                    <form action={formAction}>
                         <div className="flex flex-col gap-6">
                             <div className="grid gap-3">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
+                                    name="email"
                                     id="email"
                                     type="email"
                                     placeholder="m@example.com"
@@ -45,15 +70,13 @@ export function LoginForm({
                                         Forgot your password?
                                     </a>
                                 </div>
-                                <Input id="password" type="password" required />
+                                <Input name="password" id="password" type="password" required />
                             </div>
                             <div className="flex flex-col gap-3">
-                                <Button type="submit" className="w-full">
-                                    Login
-                                </Button>
-                                <Button variant="outline" className="w-full">
+                                <SubmitButton />
+                                {/* <Button variant="outline" className="w-full">
                                     Login with Google
-                                </Button>
+                                </Button> */}
                             </div>
                         </div>
                         <div className="mt-4 text-center text-sm">
